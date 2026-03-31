@@ -11,23 +11,155 @@ Execute plan by dispatching fresh subagent per task, with two-stage review after
 
 **Core principle:** Fresh subagent per task + two-stage review (spec then quality) = high quality, fast iteration
 
+## Three Entry Points
+
+> Every task belongs to one of three entry points. Identify the entry point first, then follow the corresponding flow.
+
+### Entry Point 1: Create New Project (Full Flow)
+
+**Trigger:**
+- "帮我做一个 XX 项目" / "开发一个新 XX"
+- "创建一个 XX 系统"
+- No existing project in workspace
+
+**Flow:** Full 5-stage pipeline
+
+```
+Stage 1: Requirements → Stage 2: Design → Stage 3: Plan → Stage 4: Implementation → Stage 5: QA
+```
+
+**Steps:**
+1. brainstorming → outputs design document
+2. writing-plans → outputs implementation plan
+3. **This skill (subagent-driven-development)** → Stage 4 execution
+4. verification-before-completion → Stage 5 QA
+
+---
+
+### Entry Point 2: Update Requirements (Incremental Flow)
+
+**Trigger:**
+- "给 XX 项目增加 XX 功能" / "修改 XX 的需求"
+- "更新 XX 项目"
+- Project exists but requirements changed
+
+**Flow:** Resume from Stage 2 or 3 (skip completed stages)
+
+```
+Determine starting stage from PROGRESS.md stage field
+    ↓
+Stage 2 or 3 → brainstorming / writing-plans (if needed)
+    ↓
+Stage 4: subagent-driven-development
+    ↓
+Stage 5: verification-before-completion
+```
+
+---
+
+### Entry Point 3: Fix Bug (Streamlined Flow)
+
+**Trigger:**
+- "修 XX bug" / "修复 XX 问题"
+- "XX 有问题"
+- Project exists with a bug to fix
+
+**Flow:** Skip Stages 1-3, go directly to 4→5
+
+```
+Stage 4: systematic-debugging → identify root cause → record in PROGRESS.md notes
+    ↓
+Stage 4: subagent-driven-development (with root cause in context)
+    ↓
+Stage 5: verification-before-completion
+```
+
+**Important:** After systematic-debugging, the root cause MUST be written to PROGRESS.md notes before dispatching the implementer subagent.
+
+---
+
+### PROGRESS.md Initialization Templates
+
+**Entry Point 1 (New Project):**
+```markdown
+# {name}
+
+stage: 1
+project_dir: project/{name}/
+
+stages:
+  1_requirements: ○
+  2_design: ○
+  3_planning: ○
+  4_development: ○
+  5_qa: ○
+
+active_task: Requirements - collecting user requirements
+
+notes: |
+  (awaiting user description)
+```
+
+**Entry Point 2 (Update Requirements):**
+```markdown
+# {name}
+
+stage: 2
+project_dir: project/{name}/
+
+stages:
+  1_requirements: ✅
+  2_design: 🔄
+  3_planning: ○
+  4_development: ○
+  5_qa: ○
+
+active_task: Update requirements - redesign {feature name}
+
+notes: |
+  Requirement change: {description}
+  Reason: {why the change is needed}
+```
+
+**Entry Point 3 (Bug Fix):**
+```markdown
+# {name}
+
+stage: 4
+project_dir: project/{name}/
+
+stages:
+  1_requirements: ✅
+  2_design: ✅
+  3_planning: ✅
+  4_development: 🔄
+  5_qa: ○
+
+active_task: Bug fix - {bug description}
+
+notes: |
+  Root cause: {from systematic-debugging}
+  Fix: {what was changed}
+```
+
 ## When to Use
 
 ```dot
 digraph when_to_use {
-    "Have implementation plan?" [shape=diamond];
-    "Tasks mostly independent?" [shape=diamond];
-    "Stay in this session?" [shape=diamond];
-    "subagent-driven-development" [shape=box];
-    "executing-plans" [shape=box];
-    "Manual execution or brainstorm first" [shape=box];
+    "Identify entry point" [shape=diamond];
+    "Entry 1: New project?" [shape=diamond];
+    "Entry 2: Update requirements?" [shape=diamond];
+    "Entry 3: Fix bug?" [shape=diamond];
+    "Full flow (brainstorming → plan → implement → verify)" [shape=box];
+    "Incremental flow (plan → implement → verify)" [shape=box];
+    "Streamlined (debug → implement → verify)" [shape=box];
 
-    "Have implementation plan?" -> "Tasks mostly independent?" [label="yes"];
-    "Have implementation plan?" -> "Manual execution or brainstorm first" [label="no"];
-    "Tasks mostly independent?" -> "Stay in this session?" [label="yes"];
-    "Tasks mostly independent?" -> "Manual execution or brainstorm first" [label="no - tightly coupled"];
-    "Stay in this session?" -> "subagent-driven-development" [label="yes"];
-    "Stay in this session?" -> "executing-plans" [label="no - parallel session"];
+    "Identify entry point" -> "Entry 1: New project?";
+    "Entry 1: New project?" -> "Full flow (brainstorming → plan → implement → verify)";
+    "Entry 1: New project?" -> "Entry 2: Update requirements?" [label="no"];
+    "Entry 2: Update requirements?" -> "Incremental flow (plan → implement → verify)";
+    "Entry 2: Update requirements?" -> "Entry 3: Fix bug?" [label="no"];
+    "Entry 3: Fix bug?" -> "Streamlined (debug → implement → verify)";
 }
 ```
 
