@@ -5,6 +5,22 @@ description: Use when you have a spec or requirements for a multi-step task, bef
 
 # Writing Plans
 
+## Configuration
+
+Paths are configurable via `.superpowers.json` at the Superpowers repository root.
+
+```json
+{
+  "paths": {
+    "plan_dir": "docs/superpowers/plans"
+  }
+}
+```
+
+If `plan_dir` is set, plans are saved to that directory. Otherwise defaults to `docs/superpowers/plans`.
+
+To determine the Superpowers root at runtime, use the skill's parent directory.
+
 ## Overview
 
 Write comprehensive implementation plans assuming the engineer has zero context for our codebase and questionable taste. Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. Frequent commits.
@@ -15,8 +31,8 @@ Assume they are a skilled developer, but know almost nothing about our toolset o
 
 **Context:** This should be run in a dedicated worktree (created by brainstorming skill).
 
-**Save plans to:** `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`
-- (User preferences for plan location override this default)
+**Save plans to:** `{plan_dir}/YYYY-MM-DD-<feature-name>.md` (default: `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`)
+- Plan directory is read from `.superpowers.json` config file if present
 
 ## Scope Check
 

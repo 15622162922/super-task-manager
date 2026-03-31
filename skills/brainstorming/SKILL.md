@@ -13,6 +13,20 @@ Start by understanding the current project context, then ask questions one at a 
 Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
 </HARD-GATE>
 
+## Configuration
+
+Paths are configurable via `.superpowers.json` at the Superpowers repository root.
+
+```json
+{
+  "paths": {
+    "spec_dir": "docs/superpowers/specs"
+  }
+}
+```
+
+If `spec_dir` is set, specs are saved to that directory. Otherwise defaults to `docs/superpowers/specs`.
+
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
 Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
@@ -26,7 +40,7 @@ You MUST create a task for each of these items and complete them in order:
 3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
 4. **Propose 2-3 approaches** — with trade-offs and your recommendation
 5. **Present design** — in sections scaled to their complexity, get user approval after each section
-6. **Write design doc** — save to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` and commit
+6. **Write design doc** — save to `{spec_dir}/YYYY-MM-DD-<topic>-design.md` (default: `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`) and commit
 7. **Spec self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 8. **User reviews written spec** — ask user to review the spec file before proceeding
 9. **Transition to implementation** — invoke writing-plans skill to create implementation plan
@@ -108,8 +122,8 @@ digraph brainstorming {
 
 **Documentation:**
 
-- Write the validated design (spec) to `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`
-  - (User preferences for spec location override this default)
+- Write the validated design (spec) to `{spec_dir}/YYYY-MM-DD-<topic>-design.md` (default: `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`)
+  - Spec directory is read from `.superpowers.json` config file if present
 - Use elements-of-style:writing-clearly-and-concisely skill if available
 - Commit the design document to git
 
