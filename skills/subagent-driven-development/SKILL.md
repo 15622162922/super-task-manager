@@ -142,6 +142,60 @@ notes: |
   Fix: {what was changed}
 ```
 
+## Stage Discipline Rules (HARD-GATE)
+
+These rules apply to ALL entry points. Violations are not acceptable.
+
+### Rule 1: Stage Transition
+
+Before moving to a new stage, the current stage must be marked complete.
+
+| Current stage not done | Action |
+|------------------------|--------|
+| Cannot skip to next stage | Wait until current stage completes |
+| Cannot enter next stage | First complete current stage |
+| Cannot start implementation | Must complete Requirements → Design → Plan |
+
+**Hard rule:** Stage N is not complete until Stage N's gate is passed.
+
+### Rule 2: active_task Tracking
+
+Every action step must update the `active_task` field in PROGRESS.md.
+
+**When to update:**
+- Before starting a new action → set `active_task`
+- After completing an action → keep `active_task` set to current action
+- Stage completed → update `stages.{n}` to ✅
+
+**Format:**
+```markdown
+active_task: {Stage name} - {Specific action description}
+```
+
+Example:
+```markdown
+active_task: Implementation - Task 3: /api/project/<id> endpoint
+```
+
+### Rule 3: PROGRESS.md Update Timing
+
+| When | What to update |
+|------|---------------|
+| Starting a new stage | `stage`, `active_task`, `stages.{n}` = 🔄 |
+| Stage has major decision | `notes` |
+| Stage completes | `stages.{n}` = ✅ |
+| Entire project completes | `stage`, `stages.{n}` = ✅, `active_task` = done |
+
+### Rule 4: Don't Skip Stages
+
+For Entry Point 1 (New Project), no stage may be skipped:
+
+```
+Stage 1 (Requirements) → Stage 2 (Design) → Stage 3 (Plan) → Stage 4 (Implement) → Stage 5 (QA)
+```
+
+For Entry Point 3 (Bug Fix), Stages 1-3 are bypassed, but Stage 4 and 5 are mandatory.
+
 ## When to Use
 
 ```dot
