@@ -467,6 +467,11 @@ Done!
 - If marker found → work completed (result delivery failed, not the work itself)
 - If marker not found → real failure, proceed accordingly
 
+**For Entry Point 3 (Bug Fix):**
+- Always call systematic-debugging BEFORE dispatching implementer
+- Root cause MUST be in PROGRESS.md notes before implementer starts
+- Never dispatch implementer with just the bug description — include root cause
+
 ## Integration
 
 **Required workflow skills:**
