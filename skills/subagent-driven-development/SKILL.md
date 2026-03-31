@@ -99,6 +99,74 @@ Use the least powerful model that can handle each role to conserve cost and incr
 - Touches multiple files with integration concerns → standard model
 - Requires design judgment or broad codebase understanding → most capable model
 
+## Handling Subagent Result Verification (IMPORTANT)
+
+**Problem:** Subagent tool result delivery is unreliable — subagent may complete work (git commit) but result times out before delivery. This causes the controller to incorrectly assume work was not done.
+
+**Solution: Use git log as the single source of truth.**
+
+Subagent result delivery may fail, but **git commit never lies**. Always verify via git log, not via subagent report.
+
+### The Verification Loop
+
+```
+Spawn subagent with task
+    ↓
+Wait up to [timeout] for result
+    ↓
+Result arrived? → ✅ Use it
+    ↓ (no)
+Check git log for [TASK-N-DONE] marker
+    ↓
+Found? → ✅ Work completed (use it)
+Not found? → ❌ Real failure (handle accordingly)
+```
+
+### Commit Message Format (Required)
+
+Every implementer subagent MUST use this exact commit message format:
+
+```
+[TASK-{N}-DONE] {short description}
+```
+
+Example: `[TASK-3-DONE] feat: /api/project/<id> with PROGRESS.md parsing`
+
+The `[TASK-N-DONE]` marker is the signal that task N is complete, regardless of whether the subagent result delivery succeeded.
+
+### PROGRESS.md Tracking (Recommended)
+
+For projects that have a PROGRESS.md file, append completion record after committing:
+
+```markdown
+### Task 3 - /api/project/<id> 实现
+- **时间**: 2026-04-01 00:32
+- **Commit**: eab11af
+- **状态**: ✅ 完成
+- **备注**: parse_progress_content 增强支持 YAML 块
+```
+
+This provides human-readable verification and is especially useful for debugging.
+
+### Git Log Verification Command
+
+```bash
+git log --oneline --all | grep "\[TASK-{N}-DONE\]"
+```
+
+If grep finds a match → task is done. No match → task failed or not started.
+
+### Don't Trust Report Status Alone
+
+| Report says | Git log has marker | Actual status |
+|-------------|-------------------|---------------|
+| DONE | ✅ | DONE (confirmed) |
+| DONE | ❌ | DONE (confirmed, marker not required) |
+| timeout | ✅ | DONE (work completed, delivery failed) |
+| timeout | ❌ | FAILED (real failure) |
+
+**Always check git log when result delivery fails.**
+
 ## Handling Implementer Status
 
 Implementer subagents report one of four statuses. Handle each appropriately:
@@ -261,6 +329,11 @@ Done!
 **If subagent fails task:**
 - Dispatch fix subagent with specific instructions
 - Don't try to fix manually (context pollution)
+
+**If subagent result times out:**
+- Check git log for `[TASK-N-DONE]` marker before assuming failure
+- If marker found → work completed (result delivery failed, not the work itself)
+- If marker not found → real failure, proceed accordingly
 
 ## Integration
 

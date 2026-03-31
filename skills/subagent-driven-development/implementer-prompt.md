@@ -32,7 +32,7 @@ Task tool (general-purpose):
     1. Implement exactly what the task specifies
     2. Write tests (following TDD if task says to)
     3. Verify implementation works
-    4. Commit your work
+    4. Commit your work — **MUST use format: `[TASK-{N}-DONE] {description}`** (e.g. `[TASK-3-DONE] feat: /api/project/<id> with PROGRESS.md parsing`)
     5. Self-review (see below)
     6. Report back
 
@@ -103,9 +103,11 @@ Task tool (general-purpose):
     - **Status:** DONE | DONE_WITH_CONCERNS | BLOCKED | NEEDS_CONTEXT
     - What you implemented (or what you attempted, if blocked)
     - What you tested and test results
-    - Files changed
+    - Commit hash (run `git log --oneline -1` to get it)
     - Self-review findings (if any)
     - Any issues or concerns
+
+    **Note:** Even if result delivery fails, your commit is still recorded. Use the `[TASK-N-DONE]` format in commit messages — the controller will verify via git log.
 
     Use DONE_WITH_CONCERNS if you completed the work but have doubts about correctness.
     Use BLOCKED if you cannot complete the task. Use NEEDS_CONTEXT if you need
