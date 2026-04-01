@@ -73,6 +73,95 @@ Skip any step = lying, not verifying
 | "Partial check is enough" | Partial proves nothing |
 | "Different words so rule doesn't apply" | Spirit over letter |
 
+## Web Testing Flow (Browser-Based Verification)
+
+For web projects, command-line verification is insufficient. Use browser automation with screenshots.
+
+**When to use:**
+- Frontend/web application projects
+- UI interaction verification
+- Any project with a web interface
+
+### The Web Verification Loop
+
+```
+1. OPEN: browser.open(url)
+2. VERIFY: Take screenshot → Confirm page loaded correctly
+3. ACTION: Perform step (click, type, scroll, etc.)
+4. VERIFY: Take screenshot → Confirm step achieved expected result
+5. REPEAT: Steps 3-4 for each action
+6. REPORT: All steps + all screenshots confirmed
+```
+
+### Screenshot Naming Convention
+
+```
+{screenshot_dir}/
+  01_page_load.png        # Step 1: initial state
+  02_action_name.png      # Step 2: after each action
+  ...
+  0N_final_state.png      # Final state
+```
+
+### Verification Rules
+
+| Step | Required |
+|------|----------|
+| Every action has a before/after screenshot | ✅ Must |
+| Each screenshot verified against expected result | ✅ Must |
+| Named sequentially for traceability | ✅ Must |
+| Failure at any step → STOP and report | ✅ Must |
+| All screenshots saved and reviewed | ✅ Must |
+
+### Web Test Report Format
+
+```markdown
+## Web Verification Report
+
+### Step 1: {Action description}
+- **URL:** {url}
+- **Screenshot:** `01_page_load.png`
+- **Expected:** {what should be visible}
+- **Result:** ✅ PASS / ❌ FAIL
+
+### Step 2: {Action description}
+- **Action:** Click button "X"
+- **Screenshot:** `02_after_click.png`
+- **Expected:** Panel Y should open
+- **Result:** ✅ PASS / ❌ FAIL
+
+---
+
+**Overall: {N}/{total} steps passed**
+```
+
+### Example
+
+```
+✅ Step 1: Open taskbar-sp
+   URL: http://localhost:5002/
+   Screenshot: 01_page_load.png
+   Expected: 7 project cards visible
+   Result: ✅ PASS
+
+✅ Step 2: Click "navi-station" card
+   Action: click .project-card[data-id="navi-station"]
+   Screenshot: 02_detail_panel.png
+   Expected: Detail panel slides in from right
+   Result: ✅ PASS
+
+Overall: 2/2 steps passed
+```
+
+### Common Mistakes
+
+```
+❌ "Page looks fine" (no screenshot)
+❌ "Action worked" (no verification screenshot)
+❌ "UI is correct" (no sequential evidence)
+❌ Trusting browser console errors to be empty
+```
+
 ## Key Patterns
 
 **Tests:**
